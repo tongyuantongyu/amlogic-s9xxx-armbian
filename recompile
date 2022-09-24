@@ -42,6 +42,7 @@
 make_path="${PWD}"
 compile_path="${make_path}/compile-kernel"
 kernel_path="${compile_path}/kernel"
+patches_path="${compile_path}/patches"
 config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
 armbian_path="${compile_path}/tools/armbian"
@@ -313,6 +314,19 @@ get_kernel_source() {
             echo -e "${INFO} Use local source code, compile the kernel version [ ${kernel_version} ]."
         fi
     fi
+
+    # Apply custom patches
+    if [ -d ${patches_path}/${local_kernel_path} ]
+    then
+        set -e
+        for patch in ${patches_path}/${local_kernel_path}/*.patch; do
+            echo -e "${INFO} Applying patch '$patch'"
+            patch -d "${kernel_path}/${local_kernel_path}" -p1 < ${patch}
+        done
+        set +e
+    fi
+
+    sync
 }
 
 headers_install() {
